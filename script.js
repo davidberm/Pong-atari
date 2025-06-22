@@ -93,6 +93,43 @@ function render() {
   drawBall(ballX, ballY);
 }
 
+
+let ballX = canvas.width / 2;
+let ballY = canvas.height / 2;
+let ballSize = 10;
+let ballSpeedX = 5;
+let ballSpeedY = 4;
+
+function drawBall(x, y, size, color) {
+  ctx.fillStyle = color;
+  ctx.fillRect(x, y, size, size);
+}
+
+function moveBall() {
+  ballX += ballSpeedX;
+  ballY += ballSpeedY;
+
+  // Colisión con bordes
+  if (ballY <= 0 || ballY + ballSize >= canvas.height) {
+    ballSpeedY = -ballSpeedY;
+  }
+}
+
+function render() {
+  drawRect(0, 0, canvas.width, canvas.height, "#000");
+  drawRect(0, playerY, paddleWidth, paddleHeight, "#fff");
+  drawRect(canvas.width - paddleWidth, aiY, paddleWidth, paddleHeight, "#fff");
+  drawBall(ballX, ballY, ballSize, "#fff");
+}
+
+function gameLoop() {
+  moveBall();
+  render();
+}
+
+setInterval(gameLoop, 1000 / 60);
+
+
 function game() {
   update();
   render();
