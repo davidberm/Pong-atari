@@ -109,6 +109,58 @@ function moveBall() {
   ballX += ballSpeedX;
   ballY += ballSpeedY;
 
+
+
+function checkCollision(paddleX, paddleY) {
+  return (
+    ballX < paddleX + paddleWidth &&
+    ballX + ballSize > paddleX &&
+    ballY < paddleY + paddleHeight &&
+    ballY + ballSize > paddleY
+  );
+}
+
+function moveBall() {
+  ballX += ballSpeedX;
+  ballY += ballSpeedY;
+
+  // Colisión con bordes
+  if (ballY <= 0 || ballY + ballSize >= canvas.height) {
+    ballSpeedY = -ballSpeedY;
+  }
+
+  // Colisión con jugador
+  if (checkCollision(0, playerY)) {
+    ballSpeedX = -ballSpeedX;
+    ballX = paddleWidth; // evitar que se quede pegada
+  }
+
+  // Colisión con IA
+  if (checkCollision(canvas.width - paddleWidth, aiY)) {
+    ballSpeedX = -ballSpeedX;
+    ballX = canvas.width - paddleWidth - ballSize;
+  }
+
+  // Punto para la IA o el jugador
+  if (ballX < 0 || ballX > canvas.width) {
+    resetBall();
+  }
+}
+
+function resetBall() {
+  ballX = canvas.width / 2;
+  ballY = canvas.height / 2;
+  ballSpeedX = -ballSpeedX;
+  ballSpeedY = 4;
+}
+
+
+
+
+
+
+
+  
   // Colisión con bordes
   if (ballY <= 0 || ballY + ballSize >= canvas.height) {
     ballSpeedY = -ballSpeedY;
