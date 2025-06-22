@@ -110,7 +110,6 @@ function moveBall() {
   ballY += ballSpeedY;
 
 
-
 function checkCollision(paddleX, paddleY) {
   return (
     ballX < paddleX + paddleWidth &&
@@ -155,12 +154,6 @@ function resetBall() {
 }
 
 
-
-
-
-
-
-  
   // Colisión con bordes
   if (ballY <= 0 || ballY + ballSize >= canvas.height) {
     ballSpeedY = -ballSpeedY;
@@ -191,5 +184,12 @@ setInterval(game, 1000 / 60);
 
 canvas.addEventListener("mousemove", (e) => {
   const rect = canvas.getBoundingClientRect();
+
+
+  canvas.addEventListener("mousemove", function (e) {
+  const rect = canvas.getBoundingClientRect();
+  playerY = e.clientY - rect.top - paddleHeight / 2;
+});
+
   playerY = e.clientY - rect.top - paddleHeight / 2;
 });
