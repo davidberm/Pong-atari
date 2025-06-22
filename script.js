@@ -144,6 +144,14 @@ function moveBall() {
   if (ballX < 0 || ballX > canvas.width) {
     resetBall();
   }
+
+  // Movimiento simple de la IA
+  if (aiY + paddleHeight / 2 < ballY) {
+    aiY += 4;
+  } else {
+    aiY -= 4;
+  }
+
 }
 
 function resetBall() {
