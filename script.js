@@ -1,18 +1,19 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-// Dimensiones y posiciones
-const paddleWidth = 10, paddleHeight = 100, ballSize = 10;
+const paddleWidth = 10, paddleHeight = 100;
 let playerY = (canvas.height - paddleHeight) / 2;
 let aiY = (canvas.height - paddleHeight) / 2;
+
+const ballSize = 10;
 let ballX = canvas.width / 2;
 let ballY = canvas.height / 2;
 let ballSpeedX = 5;
-let ballSpeedY = 4;
+let ballSpeedY = 5;
+
 let playerScore = 0;
 let aiScore = 0;
 
-// Dibujar elementos
 function drawRect(x, y, w, h, color) {
   ctx.fillStyle = color;
   ctx.fillRect(x, y, w, h);
@@ -23,6 +24,19 @@ function drawBall(x, y) {
   ctx.fillRect(x, y, ballSize, ballSize);
 }
 
+function resetBall() {
+  ballX = canvas.width / 2;
+  ballY = canvas.height / 2;
+  ballSpeedX *= -1;
+  ballSpeedY = 5;
+}
+
+function moveAI() {
+  let aiCenter = aiY + paddleHeight / 2;
+  if (aiCenter < ballY - 35) aiY += 6;
+  else if (aiCenter > ballY + 35) aiY -= 6;
+}
+
 function drawNet() {
   for (let i = 0; i < canvas.height; i += 20) {
     drawRect(canvas.width / 2 - 1, i, 2, 10, "#fff");
@@ -30,51 +44,35 @@ function drawNet() {
 }
 
 function drawScore() {
-  ctx.fillStyle = "#fff";
   ctx.font = "20px Arial";
+  ctx.fillStyle = "#FFFFFF";
   ctx.fillText(`Jugador 1: ${playerScore}`, 100, 30);
   ctx.fillText(`Jugador 2: ${aiScore}`, canvas.width - 150, 30);
 }
 
-// Movimiento
-function resetBall() {
-  ballX = canvas.width / 2;
-  ballY = canvas.height / 2;
-  ballSpeedX = -ballSpeedX;
-  ballSpeedY = 4;
-}
-
-function checkCollision(paddleX, paddleY) {
-  return (
-    ballX < paddleX + paddleWidth &&
-    ballX + ballSize > paddleX &&
-    ballY < paddleY + paddleHeight &&
-    ballY + ballSize > paddleY
-  );
-}
-
-function moveBall() {
+function update() {
   ballX += ballSpeedX;
   ballY += ballSpeedY;
 
-  // Colisión con bordes
   if (ballY <= 0 || ballY + ballSize >= canvas.height) {
-    ballSpeedY = -ballSpeedY;
+    ballSpeedY *= -1;
   }
 
-  // Colisión con jugador
-  if (checkCollision(0, playerY)) {
-    ballSpeedX = -ballSpeedX;
-    ballX = paddleWidth;
+  // Colisión de paletas de jugadores
+  if (ballX <= paddleWidth &&
+      ballY > playerY &&
+      ballY < playerY + paddleHeight) {
+    ballSpeedX *= -1;
   }
 
-  // Colisión con IA
-  if (checkCollision(canvas.width - paddleWidth, aiY)) {
-    ballSpeedX = -ballSpeedX;
-    ballX = canvas.width - paddleWidth - ballSize;
+  // Colisión de paletas
+  if (ballX + ballSize >= canvas.width - paddleWidth &&
+      ballY > aiY &&
+      ballY < aiY + paddleHeight) {
+    ballSpeedX *= -1;
   }
 
-  // Puntos
+  //Salida izquierda o derecha
   if (ballX < 0) {
     aiScore++;
     resetBall();
@@ -83,31 +81,25 @@ function moveBall() {
     resetBall();
   }
 
-  // Movimiento IA simple
-  const aiCenter = aiY + paddleHeight / 2;
-  if (aiCenter < ballY - 35) aiY += 6;
-  else if (aiCenter > ballY + 35) aiY -= 6;
+  moveAI();
 }
 
-// Renderizado
 function render() {
-  drawRect(0, 0, canvas.width, canvas.height, "#000");
+  drawRect(0, 0, canvas.width, canvas.height, "#000000");
   drawNet();
   drawScore();
-  drawRect(0, playerY, paddleWidth, paddleHeight, "#fff"); // Jugador
-  drawRect(canvas.width - paddleWidth, aiY, paddleWidth, paddleHeight, "#fff"); // IA
+  drawRect(0, playerY, paddleWidth, paddleHeight, "#fff");
+  drawRect(canvas.width - paddleWidth, aiY, paddleWidth, paddleHeight, "#fff");
   drawBall(ballX, ballY);
 }
 
-// Loop
-function gameLoop() {
-  moveBall();
+function game() {
+  update();
   render();
 }
 
-setInterval(gameLoop, 1000 / 60);
+setInterval(game, 1000 / 60);
 
-// Movimiento jugador
 canvas.addEventListener("mousemove", (e) => {
   const rect = canvas.getBoundingClientRect();
   playerY = e.clientY - rect.top - paddleHeight / 2;
